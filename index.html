@@ -1,0 +1,169 @@
+<!doctype html>
+<html>
+    <head>
+        <title>Online Slugifier</title>
+        <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+        <style>
+            h3 {
+                text-align: center;
+                width: 100%;
+            }
+            .width-80 {
+                width: 80%;
+            }
+            .ml10 {
+                margin-left: 10px !important;
+            }
+            .mt20 {
+                margin-top: 20px !important;
+            }
+            .mt50 {
+                margin-top: 50px !important;;
+            }
+            .center-div {
+                margin: 0 auto;
+            }
+            #separator {
+                width: 30px;
+            }
+            #truncate {
+                width: 50px;
+            }
+            #success-alert {
+                position: absolute;
+                width: 400px;
+                display: none;
+                top: 20px;
+                right: 5%;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="container">
+            <div class="row width-80 center-div">
+                <h1 class="text-center">Online Slugifier</h1>
+                <br/>
+                <p>Slugs are Human readable URLs created from a string. They normally identify a resource, while keeping it fairly readable for normal people.</p>
+                <p>Used normally in GET requests, they are very good for SEO, has they increase the chances of a higher score on page indexing on most search engines.</p>
+                <br/>
+                <p>This tool will create a slug based on a given string</p>
+                <p>Optionally you can send a set of parameters that will affect the slugification. Those parameters are:</p>
+                <ul>
+                    <li><strong>separator:</strong> Defines a different separator (default is "-")</li>
+                    <li><strong>truncate:</strong> (Number) Truncates the slug at nth char. Sending 0 or NaN will not truncate. Defaults to 0;</li>
+                    <li><strong>lowercase:</strong> (boolean) Determines if all chars are to be lowercased. Defaults to yes;</li>
+                    <li><strong>symbols:</strong> (boolean) Determines if symbols are to be converted. Defaults to yes;</li>
+                </ul>
+            </div>
+            <div class="row form-group width-80 center-div">
+                <label for="input" class="mt20">Original Text</label>
+                <input type="text" id="input" class="form-control" placeholder="Insert original text here"/>
+                <label for="output" class="mt20">Slug</label>
+                <input type="text" id="output" class="form-control" placeholder="slug will appear here"/>
+            </div>
+            <div class="row mt50 width-80 center-div form-group">
+                <label for ="separator" class="checkbox-inline col-sm-2 col-xs-8 text-right">Separator</label>
+                <div class="col-sm-1 col-xs-4">
+                    <input type="text" id="separator"class="form-control" maxlength="1" value="-"/>
+                </div>
+
+                <label for="truncate" class="checkbox-inline col-sm-2 col-xs-8 text-right">Truncate at</label>
+                <div class="col-sm-1 col-xs-4">
+                    <input type="text" id="truncate" class="form-control" maxlength="3" onkeypress="noNumbers(event)">
+                </div>
+
+                <div class="col-sm-3 col-xs-9 text-right">
+                    <label for="lowercase" class="checkbox-inline">Lowercase</label>
+                    <input type="checkbox" id="lowercase" checked="checked" class="ml10 pull-right">
+                </div>
+                <div class="col-xs-3 hidden-sm hidden-md hidden-lg"></div>
+
+                <div class="col-sm-3 col-xs-9 text-right">
+                    <label for="symbols" class="checkbox-inline">Clear Symbols</label>
+                    <input type="checkbox" id="symbols" checked="checked" class="ml10 pull-right">
+                </div>
+                <div class="col-xs-3 hidden-sm hidden-md hidden-lg"></div>
+            </div>
+            <div class="row text-center h3 mt50">
+                <button type="button" id="convertBtn" class="btn btn-primary" onclick="convert()">Convert</button>
+                <button type="button" id="copyBtn" class="btn btn-primary" disabled="disabled" onclick="copyToClipboard($('#output').val()); $('#copiedSuccess').show()">Copy to Clipboard</button>
+                <div id="success-alert" class="alert alert-success">
+                    <strong>Success!</strong>The Slug was copied to your clipboard.
+                </div>
+            </div>
+        </div>
+
+        <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+        <script src="Slugifier.js"></script>
+        <script type="text/javascript">
+            function noNumbers(e) {
+                var keyCodes = {
+                    'backspace': 8,
+                    'delete': 46,
+                    'leftArrow': 37,
+                    'rightArrow': 39,
+                    'number1': 48,
+                    'number9': 57
+                };
+
+                var charCode = e.which ? e.which :
+                        (e.charCode ? e.charCode :
+                                (e.keyCode ? e.keyCode : 0));
+
+                if ((charCode < keyCodes.number1 || charCode > keyCodes.number9) &&
+                        charCode !== keyCodes.delete &&
+                        charCode !== keyCodes.backspace &&
+                        charCode !== keyCodes.leftArrow &&
+                        charCode !== keyCodes.rightArrow)
+                    e.preventDefault();
+            }
+
+            var convert = function() {
+                var slugifier = new Slugifier({
+                    separator: $('#separator').val(),
+                    truncate: $('#truncate').val(),
+                    lowercase: $('#lowercase').is(':checked'),
+                    symbols: $('#symbols').is(':checked')
+                });
+
+                var result = slugifier.slug($('#input').val());
+
+                $('#output').val(result);
+                $('#copyBtn').attr('disabled', !result);
+            };
+
+            var copyToClipboard = (function() {
+                var _dataString = null;
+                document.addEventListener("copy", function(e){
+                    if (_dataString !== null) {
+                        try {
+                            e.clipboardData.setData("text/plain", _dataString);
+                            e.preventDefault();
+
+                            //Show message and hide it again
+                            $("#success-alert").fadeTo(2000, 500).slideUp(500, function(){
+                                $("#success-alert").slideUp(500);
+                            });
+
+                        } finally {
+                            _dataString = null;
+                        }
+                    }
+                });
+                return function(data) {
+                    _dataString = data;
+                    document.execCommand("copy");
+                };
+            })();
+        </script>
+		<script>
+			(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+					(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+			})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+			ga('create', 'UA-87816850-2', 'auto');
+			ga('send', 'pageview');
+		</script>
+    </body>
+</html>
