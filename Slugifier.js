@@ -20,17 +20,17 @@
         // Replace spaces with the separator
         result = result.replace(/\s+/g, this.options.separator);
 
-        // Replace multiple separators with single separator
-        var pattern = "\\" + this.options.separator + "\\" + this.options.separator+ "+";
-        var regex = new RegExp(pattern, "g");
-        result = result.replace(regex, this.options.separator);
-
         // Symbols
         if (this.options.symbols) {
             pattern = "[^\\w\\" + this.options.separator + "]+";
             regex = new RegExp(pattern, "g");
             result = result.replace(regex, '');
         }
+
+        // Replace multiple separators with single separator
+        var pattern = "\\" + this.options.separator + "\\" + this.options.separator+ "+";
+        var regex = new RegExp(pattern, "g");
+        result = result.replace(regex, this.options.separator);
 
         // Truncate if provided
         if (!isNaN(this.options.truncate) && this.options.truncate) {

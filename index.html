@@ -24,7 +24,7 @@
                 margin: 0 auto;
             }
             #separator {
-                width: 30px;
+                width: 35px;
             }
             #truncate {
                 width: 50px;
@@ -156,6 +156,11 @@
                     document.execCommand("copy");
                 };
             })();
+
+            // Set focus on Input when entering page
+            $(function() {
+                $("#input").focus();
+            });
         </script>
     </body>
 </html>
